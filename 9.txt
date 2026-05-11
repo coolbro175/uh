@@ -1,0 +1,21 @@
+import matplotlib.pyplot as plt
+from sklearn.datasets import fetch_olivetti_faces
+from sklearn.model_selection import train_test_split
+from sklearn.naive_bayes import GaussianNB
+from sklearn.metrics import  accuracy_score
+
+
+f = fetch_olivetti_faces(shuffle=True, random_state=42)
+
+Xtr, Xte, Ytr, Yte = train_test_split(f.data, f.target, test_size=0.2, random_state=42)
+predicted = GaussianNB().fit(Xtr, Ytr).predict(Xte)
+print(f"Accuracy Score: {accuracy_score(Yte, predicted)*100:.2f}%")
+
+plt.figure(figsize=(10,5))
+for i in range(5):
+  plt.subplot(1,5,i+1)
+  plt.imshow(Xte[i].reshape(64,64), cmap='grey')
+  plt.title(f"Pred: {predicted[i]}")
+  plt.axis='off'
+
+plt.show()
