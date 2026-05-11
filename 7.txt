@@ -1,0 +1,27 @@
+import numpy as np, matplotlib.pyplot as plt
+from sklearn.datasets import fetch_openml
+from sklearn.linear_model import LinearRegression
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_squared_error, r2_score
+
+# Boston - Linear
+b = fetch_openml(name="boston", version=1, as_frame=True)
+Xtr, Xte, ytr, yte = train_test_split(b.data.to_numpy(), b.target.to_numpy(), test_size=0.2, random_state=42)
+yp = LinearRegression().fit(Xtr, ytr).predict(Xte)
+plt.scatter(yte, yp, alpha=0.6); plt.plot([yte.min(),yte.max()],[yte.min(),yte.max()],'r')
+plt.title("Linear - Boston"); plt.show()
+print(f"MSE:{mean_squared_error(yte,yp):.2f}, R²:{r2_score(yte,yp):.2f}")
+
+# Auto MPG - Polynomial via polyfit (1D → no sklearn needed)
+d = fetch_openml(name="autoMpg", version=1, as_frame=True)
+data = d.data.dropna(subset=["horsepower"])
+X = data["horsepower"].astype(float).values
+y = d.target.astype(float).loc[data.index].values
+Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.2, random_state=42)
+p = np.poly1d(np.polyfit(Xtr, ytr, 3))  # entire poly regression in one line
+yp = p(Xte)
+xs = np.linspace(X.min(), X.max(), 100)
+plt.scatter(Xte, yte, alpha=0.6); plt.plot(xs, p(xs), 'r', lw=2)
+plt.title("Poly - Auto MPG"); plt.show()
+print(f"MSE:{mean_squared_error(yte,yp):.2f}, R²:{r2_score(yte,yp):.2f}")
+

@@ -1,0 +1,14 @@
+import numpy as np, matplotlib.pyplot as plt
+
+np.random.seed(42)
+X = np.linspace(0, 10, 100)
+y = np.sin(X) + np.random.normal(scale=0.2, size=100)
+
+tau = 0.5
+W = np.exp(-(X[:, None] - X[None, :])**2 / (2*tau**2))  # n×n weights
+Xb = np.c_[np.ones(100), X]
+# For each query i: theta_i = (Xb^T W_i Xb)^-1 Xb^T W_i y, prediction = xb_i @ theta_i
+yp = np.array([Xb[i] @ np.linalg.solve(Xb.T @ (W[i,:,None]*Xb), Xb.T @ (W[i]*y)) for i in range(100)])
+
+plt.figure(figsize=(10,6)); plt.scatter(X, y, s=10); plt.plot(X, yp, 'r', lw=2)
+plt.title("LWR (tau=0.5)"); plt.grid(True); plt.show()
